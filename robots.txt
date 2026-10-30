@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+# Apercu : toutes les pages portent noindex, nofollow.
