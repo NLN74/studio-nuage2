@@ -115,3 +115,67 @@
 
 /* Accès au plan discret, sans bouton encadré. */
 .map-directions{border:0;background:transparent;min-height:30px;margin-top:4px;gap:5px}.map-directions .map-primary{padding:5px 0;font-size:10px;min-height:30px;justify-content:flex-start;gap:10px}.map-apps{border:0;flex-basis:26px}.map-apps summary{min-height:30px}.map-primary svg{width:13px;height:13px}.map-apps-menu{bottom:calc(100% + 5px);min-width:142px;padding:4px}.map-apps-menu a{font-size:11px;min-height:36px;padding:7px 9px}
+
+/* Le fond du manifeste continue au-delà de la largeur de lecture. */
+.theme-immersive #main>.manifesto{box-shadow:0 0 0 100vmax var(--noir);clip-path:inset(0 -100vmax)}
+
+/* Formules du studio : cartes éditables et ajoutables depuis le panneau. */
+.theme-immersive .pricing-section:has(.plans-grid){padding-bottom:0}
+.theme-immersive .pricing-grid.plans-grid{grid-template-columns:repeat(5,minmax(0,1fr));border:0;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);margin-top:0;gap:0}
+.theme-immersive .plans-grid>article{min-width:0;padding:30px 22px 26px;border:0;border-left:1px solid var(--line);background:transparent;color:var(--ink)}
+.theme-immersive .plans-grid>article:first-child{border-left:0;background:transparent}
+.theme-immersive .plans-grid>article.featured{background:var(--noir);color:var(--paper);border-color:var(--noir)}
+.plans-grid .plan-category{font-size:9px;letter-spacing:.13em;line-height:1.6;min-height:30px;margin:0;color:var(--muted)}
+.theme-immersive .plans-grid h2{font-size:34px;line-height:1.1;letter-spacing:-.025em;margin:12px 0 14px;white-space:nowrap}
+.plans-grid .plan-commitment{font-size:12px;line-height:1.65;min-height:40px;margin:0 0 24px;color:var(--muted)}
+.theme-immersive .plans-grid .price{font-size:76px;line-height:.95;letter-spacing:-.055em;margin:0;color:inherit}
+.theme-immersive .plans-grid .price span{font-size:27px;line-height:1.6;padding-left:6px}
+.theme-immersive .plans-grid .price-caption{font-size:11px;line-height:1.6;min-height:35px;margin:12px 0 8px;color:var(--muted)}
+.plans-grid .plan-unit{font-size:12px;font-weight:600;line-height:1.6;margin:0;letter-spacing:-.02em}
+.theme-immersive .plans-grid ul{list-style:none;padding:22px 0 0;margin:24px 0 22px;border-top:1px solid var(--line);font-size:12px;line-height:1.85;color:var(--muted)}
+.plans-grid li+li{margin-top:10px}
+.plans-grid .plan-saving{font-size:10px;line-height:1.7;letter-spacing:.01em;margin:auto 0 24px;min-height:34px}
+.theme-immersive .plans-grid .button{min-width:0;width:100%;min-height:44px;padding:12px 8px;font-size:10px;margin-top:0;background:transparent;color:inherit;border-color:currentColor}
+.theme-immersive .plans-grid .button:hover{background:var(--ink);color:var(--paper)}
+.plans-grid>article.featured :is(.plan-category,.plan-commitment,.price-caption,ul){color:#c4c3bb}
+.plans-grid>article.featured :is(.plan-unit,.plan-saving){color:var(--paper)}
+.plans-grid>article.featured ul{border-color:#52534c}
+.theme-immersive .plans-grid>article.featured .button{background:var(--paper);color:var(--noir);border-color:var(--paper)}
+.theme-immersive .plans-grid>article.featured .button:hover{background:#d5d1c7;border-color:#d5d1c7}
+.pricing-terms{padding-block:52px 64px}
+.pricing-terms-heading{display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin-bottom:34px}
+.pricing-terms-heading .eyebrow{font-size:10px;white-space:nowrap}
+.pricing-terms-heading h2{font-size:clamp(32px,3.2vw,48px);line-height:1.1;margin:0}
+.pricing-terms-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px}
+.pricing-terms-grid>article{border-top:1px solid var(--line);padding-top:24px}
+.pricing-terms-grid h3{font-size:29px;line-height:1.2;margin:0 0 22px}
+.pricing-terms-grid ul{list-style:none;padding:0;margin:0;font-size:13px;line-height:1.9;color:var(--muted)}
+.pricing-terms-grid li+li{margin-top:13px}
+.pricing-terms>.text-link{display:inline-block;margin-top:32px;font-size:12px}
+@media(max-width:1199px) and (min-width:761px){
+ .theme-immersive .pricing-grid.plans-grid{grid-template-columns:repeat(6,minmax(0,1fr))}
+ .theme-immersive .plans-grid>article{grid-column:span 2;padding:28px 25px}
+ .theme-immersive .plans-grid>article:nth-child(n+4){grid-column:span 3;border-top:1px solid var(--line)}
+ .theme-immersive .plans-grid>article:nth-child(4){border-left:0}
+ .plans-grid .plan-commitment{min-height:20px}
+}
+@media(max-width:760px){
+ .theme-immersive .pricing-grid.plans-grid{grid-template-columns:1fr}
+ .theme-immersive .plans-grid>article{padding:28px 26px;border-left:0;border-top:1px solid var(--line)}
+ .theme-immersive .plans-grid>article:first-child{border-top:0}
+ .plans-grid .plan-category{min-height:0;font-size:10px}
+ .theme-immersive .plans-grid h2{font-size:40px;margin:12px 0}
+ .plans-grid .plan-commitment{min-height:0;margin-bottom:24px}
+ .theme-immersive .plans-grid .price{font-size:78px}
+ .theme-immersive .plans-grid .price-caption{min-height:0;margin-bottom:12px}
+ .theme-immersive .plans-grid ul{margin-block:22px;font-size:13px}
+ .plans-grid .plan-saving{min-height:0;margin-bottom:24px;font-size:11px}
+ .theme-immersive .plans-grid .button{font-size:12px}
+ .pricing-terms{padding-block:38px 42px}
+ .pricing-terms-heading{display:block;margin-bottom:26px}
+ .pricing-terms-heading .eyebrow{margin-bottom:16px}
+ .pricing-terms-heading h2{font-size:37px}
+ .pricing-terms-grid{grid-template-columns:1fr;gap:28px}
+ .pricing-terms-grid h3{font-size:29px}
+ .pricing-terms>.text-link{font-size:11px}
+}
