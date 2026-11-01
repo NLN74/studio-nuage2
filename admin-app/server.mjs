@@ -28,7 +28,7 @@ const server=http.createServer(async(req,res)=>{
  const host=req.headers.host;
  if(!hosting.hosts.has(host))return send(res,403,{error:'Accès local uniquement.'});
  const url=new URL(req.url,hosting.origin); const nonce=randomBytes(18).toString('base64');
- res.setHeader('Content-Security-Policy',`default-src 'self'; script-src 'nonce-${nonce}' https://widget-static.eversports.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; frame-src 'self' https://*.eversports.io https://*.eversports.fr; connect-src 'self' https://*.eversports.io https://*.eversports.fr; object-src 'none'; base-uri 'none'; frame-ancestors 'self'`);
+ res.setHeader('Content-Security-Policy',`default-src 'self'; script-src 'nonce-${nonce}' https://widget-static.eversports.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; frame-src 'self' https://*.eversports.io https://*.eversports.fr; connect-src 'self' https://*.eversports.io https://*.eversports.fr https://graphql-widget-master.production.eversports.cloud; object-src 'none'; base-uri 'none'; frame-ancestors 'self'`);
  res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');res.setHeader('X-Frame-Options','SAMEORIGIN');if(hosting.secure)res.setHeader('Strict-Transport-Security','max-age=15552000');
  const session=auth.session(req);
  const adminPath=url.pathname==='/'||url.pathname==='/admin'||url.pathname.startsWith('/admin/');
