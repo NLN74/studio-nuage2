@@ -6,11 +6,13 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {readFile,writeFile,rename,mkdir,readdir,stat,copyFile} from 'node:fs/promises';
 import {randomBytes,createHash} from 'node:crypto';
-import {renderSite,validateDocument,zipFiles} from './server-core.mjs';
+import {validateDocument,zipFiles} from './server-core.mjs';
 const root=path.dirname(fileURLToPath(import.meta.url));
+let rendererVersion='',renderer;
+async function renderDocument(doc,page,options={}){const version=String((await stat(path.join(root,'server-core.mjs'))).mtimeMs);if(version!==rendererVersion){renderer=(await import('./server-core.mjs?v='+version)).renderSite;rendererVersion=version}return renderer(doc,page,options)}
 const hosting=hostingConfig(),{port}=hosting;
 const auth=createAuth({passwordHash:await readPasswordHash(root),secure:hosting.secure,cookieName:hosting.secure?'__Host-nuage_session':'nuage_session_'+port});
-const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.gif':'image/gif','.avif':'image/avif','.woff2':'font/woff2','.svg':'image/svg+xml','.txt':'text/plain; charset=utf-8','.xml':'application/xml'};
+const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.gif':'image/gif','.avif':'image/avif','.woff2':'font/woff2','.svg':'image/svg+xml','.txt':'text/plain; charset=utf-8','.xml':'application/xml','.ico':'image/x-icon','.webmanifest':'application/manifest+json; charset=utf-8'};
 await mkdir(path.join(root,'data/revisions'),{recursive:true});await mkdir(path.join(root,'site/uploads'),{recursive:true});
 for(const name of ['initial.json','draft.json','live.json']){try{await readFile(path.join(root,'data',name))}catch(e){if(e.code!=='ENOENT')throw e;const seed=await readFile(path.join(root,'seed/site.json'));await writeFile(path.join(root,'data',name),seed,{flag:'wx'})}}
 let draft=JSON.parse(await readFile(path.join(root,'data/draft.json'),'utf8'));
@@ -37,6 +39,7 @@ const server=http.createServer(async(req,res)=>{
   return send(res,401,{error:'Connectez-vous pour ouvrir l’administration.'});
  }
  try{
+  if(url.pathname==='/favicon.ico'&&req.method==='GET')return send(res,200,await readFile(path.join(root,'site/favicon.ico')),'image/x-icon');
   if(url.pathname==='/login'&&req.method==='GET'){let html=await readFile(path.join(root,'admin/login.html'),'utf8');return send(res,200,html.replaceAll('__NONCE__',nonce),'text/html; charset=utf-8')}
   if(url.pathname.startsWith('/api/')){
    if((req.headers.origin&&!hosting.origins.has(req.headers.origin))||req.headers['sec-fetch-site']==='cross-site')return send(res,403,{error:'Origine refusée.'});
@@ -73,7 +76,7 @@ const server=http.createServer(async(req,res)=>{
     const body=await readJSON(req),doc=body.document||draft;validateDocument(doc);const files=(await filesUnder(path.join(root,'site'))).filter(f=>!f.name.endsWith('.html')&&!/^index-.*\.js$/.test(f.name)&&!['README.md','sitemap.xml','robots.txt'].includes(f.name));
     for(const f of files)if(f.name.endsWith('.css'))f.data=Buffer.from(f.data.toString().replaceAll('/studio-nuage2/','./').replaceAll('/site/','./'));
     files.push({name:'nuage-runtime.js',data:await readFile(path.join(root,'admin/runtime.js'))});
-    for(const p of doc.pages)files.push({name:p.path==='/site/'?'index.html':p.path.slice(6),data:Buffer.from(renderSite(doc,p,{exported:true}))});
+    for(const p of doc.pages)files.push({name:p.path==='/site/'?'index.html':p.path.slice(6),data:Buffer.from(await renderDocument(doc,p,{exported:true}))});
     files.push({name:'robots.txt',data:Buffer.from(doc.global.settings.noindex?'User-agent: *\nDisallow: /\n':'User-agent: *\nAllow: /\n')});
     files.push({name:'LISEZ-MOI.txt',data:Buffer.from('Export statique de Nuage Studio. Aucun panel, brouillon ou historique inclus. Aucun envoi vers GitHub effectué.\n')});
     return send(res,200,zipFiles(files),'application/zip',{'content-disposition':'attachment; filename="nuage-site-local.zip"'});
@@ -85,10 +88,10 @@ const server=http.createServer(async(req,res)=>{
    let html=await readFile(path.join(root,'admin/index.html'),'utf8');html=html.replaceAll('__NONCE__',nonce);return send(res,200,html,'text/html; charset=utf-8');
   }
   if(url.pathname.startsWith('/preview/')){
-   const p=url.pathname==='/preview/'?draft.pages[0]:draft.pages.find(p=>p.id===url.pathname.slice(9));if(!p)return send(res,404,'Page introuvable','text/plain');return send(res,200,renderSite(draft,p,{editor:true,nonce}),'text/html; charset=utf-8');
+   const p=url.pathname==='/preview/'?draft.pages[0]:draft.pages.find(p=>p.id===url.pathname.slice(9));if(!p)return send(res,404,'Page introuvable','text/plain');return send(res,200,await renderDocument(draft,p,{editor:true,nonce,origin:hosting.origin}),'text/html; charset=utf-8');
   }
   const page=live.pages.find(p=>p.path===(url.pathname==='/site/index.html'?'/site/':url.pathname));
-  if(page)return send(res,200,renderSite(live,page,{nonce}),'text/html; charset=utf-8');
+  if(page)return send(res,200,await renderDocument(live,page,{nonce,origin:hosting.origin}),'text/html; charset=utf-8');
   if(url.pathname.startsWith('/site/')&&/\.html$/i.test(url.pathname))return send(res,404,'Cette page n’existe plus.','text/plain');
   if(url.pathname.startsWith('/admin/')||url.pathname.startsWith('/site/')){
    const base=path.join(root,url.pathname.startsWith('/admin/')?'admin':'site');const rel=decodeURIComponent(url.pathname).slice(7-(url.pathname.startsWith('/site/')?1:0));const f=path.resolve(base,rel);if(!f.startsWith(base+path.sep))return send(res,403,{error:'Chemin refusé.'});

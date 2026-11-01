@@ -18,12 +18,25 @@ export function validateDocument(d){
  return true;
 }
 
-export function renderSite(d,p,{editor=false,exported=false,nonce=''}={}){
+export function siteMetadata(d,p,{origin='',exported=false}={}){
+ const asset=exported?'./':'/site/';
+ const fallback='https://nln74.github.io/studio-nuage2/';
+ let base;try{base=new URL(origin||d.global.settings.publicSiteUrl||fallback);if(!/^https?:$/.test(base.protocol)||base.username||base.password)throw Error();base.search='';base.hash='';if(!base.pathname.endsWith('/'))base.pathname+='/' }catch{base=new URL(fallback)}
+ const pageUrl=origin&&!exported?new URL(p.path,base).href:new URL(p.path==='/site/'?'./':p.path.slice(6),base).href;
+ const imageUrl=origin&&!exported?new URL('/site/social-preview.jpg',base).href:new URL('social-preview.jpg',base).href;
+ const description=p.description||'Pilates, barre et sculpt à Sevrier, près du lac d’Annecy.';
+ const meta=(name,value,property=false)=>`<meta ${property?'property':'name'}="${name}" content="${escapeHtml(value)}">`;
+ return `<link rel="icon" href="${asset}favicon.svg" type="image/svg+xml"><link rel="icon" href="${asset}favicon-32.png" type="image/png" sizes="32x32"><link rel="icon" href="${asset}favicon-96.png" type="image/png" sizes="96x96"><link rel="shortcut icon" href="${asset}favicon.ico"><link rel="apple-touch-icon" href="${asset}apple-touch-icon.png" sizes="180x180"><link rel="mask-icon" href="${asset}safari-pinned-tab.svg" color="#111111"><link rel="manifest" href="${asset}site.webmanifest"><link rel="canonical" href="${escapeHtml(pageUrl)}">`+
+ meta('theme-color','#111111')+meta('application-name','Nuage Studio')+meta('apple-mobile-web-app-title','Nuage')+meta('apple-mobile-web-app-capable','yes')+meta('apple-mobile-web-app-statusbar-style','black')+meta('msapplication-TileColor','#111111')+meta('msapplication-config',asset+'browserconfig.xml')+
+ meta('og:type','website',true)+meta('og:locale','fr_FR',true)+meta('og:site_name','Nuage Studio',true)+meta('og:title',p.title,true)+meta('og:description',description,true)+meta('og:url',pageUrl,true)+meta('og:image',imageUrl,true)+(imageUrl.startsWith('https:')?meta('og:image:secure_url',imageUrl,true):'')+meta('og:image:type','image/jpeg',true)+meta('og:image:width','1200',true)+meta('og:image:height','630',true)+meta('og:image:alt','Nuage Studio — La culture du corps. Pilates, barre et sculpt à Sevrier.',true)+
+ meta('twitter:card','summary_large_image')+meta('twitter:title',p.title)+meta('twitter:description',description)+meta('twitter:image',imageUrl)+meta('twitter:image:alt','Nuage Studio — Pilates, barre et sculpt à Sevrier.');
+}
+export function renderSite(d,p,{editor=false,exported=false,nonce='',origin=''}={}){
  const base=exported?'./':'/admin/';
  const convert=s=>exported?s.replaceAll('/site/','./'):s;
  const settings=escapeHtml(JSON.stringify(d.global.settings));
  const scripts=`<script ${nonce?`nonce="${nonce}"`:""} src="/site/leaflet-1.9.4.js" defer></script><script ${nonce?`nonce="${nonce}"`:''} src="${exported?"./nuage-runtime.js":"/site/nuage-runtime.js"}" defer></script>`+(editor?`<script nonce="${nonce}" src="/admin/canvas-controls.js" defer></script><script nonce="${nonce}" src="/admin/bridge.js" defer></script>`:'');
- return convert(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(p.title)}</title><meta name="description" content="${escapeHtml(p.description)}">${d.global.settings.noindex?'<meta name="robots" content="noindex,nofollow">':''}<meta name="nuage-settings" content="${settings}"><link rel="icon" href="/site/logo-nuage-transparent.png"><link rel="stylesheet" href="/site/${d.global.stylesheet}"><link rel="stylesheet" href="/site/leaflet-1.9.4.css"><style id="cms-styles">${themeCSS(d,p)}</style>${scripts}</head><body data-editor="${editor}" data-page-id="${p.id}"><div class="site theme-immersive"><a class="skip-link" href="#main">Aller au contenu</a>${d.global.header}<main id="main">${p.html}</main>${d.global.footer}</div></body></html>`);
+ return convert(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(p.title)}</title><meta name="description" content="${escapeHtml(p.description)}">${d.global.settings.noindex?'<meta name="robots" content="noindex,nofollow">':''}<meta name="nuage-settings" content="${settings}">${siteMetadata(d,p,{origin,exported})}<link rel="stylesheet" href="/site/${d.global.stylesheet}"><link rel="stylesheet" href="/site/leaflet-1.9.4.css"><style id="cms-styles">${themeCSS(d,p)}</style>${scripts}</head><body data-editor="${editor}" data-page-id="${p.id}"><div class="site theme-immersive"><a class="skip-link" href="#main">Aller au contenu</a>${d.global.header}<main id="main">${p.html}</main>${d.global.footer}</div></body></html>`);
 }
 const table=Array.from({length:256},(_,n)=>{for(let k=0;k<8;k++)n=n&1?0xedb88320^(n>>>1):n>>>1;return n>>>0});
 function crc32(b){let c=0xffffffff;for(const x of b)c=table[(c^x)&255]^(c>>>8);return (c^0xffffffff)>>>0}

@@ -1,9 +1,9 @@
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const demoCoaches=[
- {name:'Coach 01',image:'/site/coach-pilates.jpg',words:['Précision','Énergie','Audace'],discipline:'Pilates Sculpt',pageId:'coach-01'},
- {name:'Coach 02',image:'/site/coach-barre.jpg',words:['Rythme','Présence','Intensité'],discipline:'Barre',pageId:'coach-02'},
- {name:'Coach 03',image:'/site/coach-renforcement.jpg',words:['Force','Fluidité','Élan'],discipline:'Calisthenics',pageId:'coach-03'},
- {name:'Coach 04',image:'/site/coach-yoga.jpg',words:['Mobilité','Équilibre','Intuition'],discipline:'Yoga',pageId:'coach-04'}
+ {name:'Coach 01',image:'/site/coach-pilates.webp',words:['Précision','Énergie','Audace'],discipline:'Pilates Sculpt',pageId:'coach-01'},
+ {name:'Coach 02',image:'/site/coach-barre.webp',words:['Rythme','Présence','Intensité'],discipline:'Barre',pageId:'coach-02'},
+ {name:'Coach 03',image:'/site/coach-renforcement.webp',words:['Force','Fluidité','Élan'],discipline:'Calisthenics',pageId:'coach-03'},
+ {name:'Coach 04',image:'/site/coach-yoga.webp',words:['Mobilité','Équilibre','Intuition'],discipline:'Yoga',pageId:'coach-04'}
 ];
 export function coachCard(coach={...demoCoaches[0],name:'Prénom Nom'}){
  const href='/site/'+coach.pageId+'.html';
@@ -18,7 +18,7 @@ export function syncCoachData(doc,sourcePageId){
  if(source.coachProfile){
   const profile=fragment(source.html),name=profile.content.querySelector('[data-coach-profile-name]')?.textContent,image=profile.content.querySelector('[data-coach-profile-image]'),words=Array.from(profile.content.querySelectorAll('[data-coach-profile-words] li')).map(n=>n.textContent);
   if(!name||!image)return;
-  source.name=name;source.title=name+' — Nuage Studio';
+  if(source.description===`Rencontrez ${source.name}, au studio Nuage à Sevrier.`)source.description=`Rencontrez ${name}, au studio Nuage à Sevrier.`;source.name=name;source.title=name+' — Nuage Studio';
   for(const page of doc.pages.filter(p=>!p.coachProfile)){
    const t=fragment(page.html);let changed=false;
    for(const card of t.content.querySelectorAll('.coach-card[data-coach-page]'))if(card.dataset.coachPage===source.id){card.querySelector('[data-coach-name]').textContent=name;const photo=card.querySelector('img');photo.setAttribute('src',image.getAttribute('src'));photo.alt=image.alt;photo.removeAttribute('srcset');card.querySelectorAll('[data-coach-word]').forEach((n,i)=>n.textContent=words[i]||'');changed=true}
@@ -30,7 +30,7 @@ export function syncCoachData(doc,sourcePageId){
    const target=doc.pages.find(p=>p.id===card.dataset.coachPage&&p.coachProfile);if(!target)continue;
    const profile=fragment(target.html),name=card.querySelector('[data-coach-name]')?.textContent,image=card.querySelector('img');if(!name||!image)continue;
    const heading=profile.content.querySelector('[data-coach-profile-name]'),photo=profile.content.querySelector('[data-coach-profile-image]');if(heading)heading.textContent=name;if(photo){photo.setAttribute('src',image.getAttribute('src'));photo.alt='Portrait de '+name;photo.removeAttribute('srcset')}
-   const words=Array.from(card.querySelectorAll('[data-coach-word]')).map(n=>n.textContent);profile.content.querySelectorAll('[data-coach-profile-words] li').forEach((n,i)=>n.textContent=words[i]||'');target.html=profile.innerHTML;target.name=name;target.title=name+' — Nuage Studio';
+   const words=Array.from(card.querySelectorAll('[data-coach-word]')).map(n=>n.textContent);profile.content.querySelectorAll('[data-coach-profile-words] li').forEach((n,i)=>n.textContent=words[i]||'');target.html=profile.innerHTML;if(target.description===`Rencontrez ${target.name}, au studio Nuage à Sevrier.`)target.description=`Rencontrez ${name}, au studio Nuage à Sevrier.`;target.name=name;target.title=name+' — Nuage Studio';
   }
  }
 }

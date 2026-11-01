@@ -112,3 +112,6 @@
 @media(prefers-reduced-motion:reduce){.coach-card-link .coach-portrait img{transition:none}.coach-card-link:hover .coach-portrait img{transform:none}}
 
 .map-apps{padding:0!important;margin:0;border-block:0}.map-apps summary{height:auto;min-height:38px}.map-preview-hit{position:absolute;inset:0;z-index:2;display:block;cursor:pointer}.studio-map-static .map-static-credit{z-index:3}.map-preview-hit:focus-visible{outline:2px solid #333;outline-offset:-3px}
+
+/* Accès au plan discret, sans bouton encadré. */
+.map-directions{border:0;background:transparent;min-height:30px;margin-top:4px;gap:5px}.map-directions .map-primary{padding:5px 0;font-size:10px;min-height:30px;justify-content:flex-start;gap:10px}.map-apps{border:0;flex-basis:26px}.map-apps summary{min-height:30px}.map-primary svg{width:13px;height:13px}.map-apps-menu{bottom:calc(100% + 5px);min-width:142px;padding:4px}.map-apps-menu a{font-size:11px;min-height:36px;padding:7px 9px}
