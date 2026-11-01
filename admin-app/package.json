@@ -1,0 +1,14 @@
+{
+  "name": "nuage-atelier-local",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "password": "node scripts/set-password.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

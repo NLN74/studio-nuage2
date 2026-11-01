@@ -1,0 +1,4 @@
+Logo : fichier original fourni par le client, conservation de la barre.
+Photographies : images conceptuelles generees pour ce projet.
+Polices de secours : Cormorant Garamond et Manrope, SIL Open Font License.
+Eyesome : fichier non fourni, non redistribue ; emplacement local() prevu.

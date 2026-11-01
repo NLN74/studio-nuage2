@@ -1,0 +1,9 @@
+.git
+.local-access.json
+.env*
+data
+site/uploads
+exports
+node_modules
+apercu-*.png
+*.log

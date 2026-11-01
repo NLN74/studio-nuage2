@@ -1,0 +1,11 @@
+.local-access.json
+.env
+.env.*
+!.env.example
+data/
+site/uploads/
+exports/
+node_modules/
+apercu-*.png
+*.log
+.DS_Store

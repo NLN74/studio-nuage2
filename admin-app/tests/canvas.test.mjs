@@ -1,0 +1,16 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import vm from 'node:vm';
+import {renderSite} from '../server-core.mjs';
+const context={module:{exports:{}}};vm.runInNewContext(await readFile(new URL('../admin/canvas-controls.js',import.meta.url),'utf8'),context);
+const {resizeBox,translateValue,dropIndex}=context.module.exports.geometry;
+const plain=v=>JSON.parse(JSON.stringify(v));
+test('Redimensionnement depuis le bord droit et le bas',()=>{assert.deepEqual(plain(resizeBox({width:200,height:100},50,20,'se')),{width:250,height:120,x:0,y:0})});
+test('Les bords supérieur et gauche gardent le coin opposé en place',()=>{assert.deepEqual(plain(resizeBox({width:200,height:100},30,20,'nw')),{width:170,height:80,x:30,y:20})});
+test('Une photo garde ses proportions quand on tire un coin',()=>{assert.deepEqual(plain(resizeBox({width:400,height:200},100,20,'se',true)),{width:500,height:250,x:0,y:0});assert.deepEqual(plain(resizeBox({width:400,height:200},-80,40,'sw',true)),{width:480,height:240,x:-80,y:0})});
+test('Les poignées des côtés règlent une seule dimension',()=>{assert.deepEqual(plain(resizeBox({width:200,height:100},40,90,'e',true)),{width:240,height:100,x:0,y:0});assert.deepEqual(plain(resizeBox({width:200,height:100},40,30,'s',true)),{width:200,height:130,x:0,y:0})});
+test('Les dimensions restent positives et bornées',()=>{const tiny=resizeBox({width:200,height:100},1000,1000,'nw');assert.equal(tiny.width,24);assert.equal(tiny.height,24);const big=resizeBox({width:200,height:100},10000,10000,'se');assert.equal(big.width,4000);assert.equal(big.height,4000)});
+test('Un déplacement reprend le décalage existant, y compris en pourcentage',()=>{assert.deepEqual(plain(translateValue('none',{width:200,height:100})),{x:0,y:0});assert.deepEqual(plain(translateValue('50% -10px',{width:200,height:100})),{x:100,y:-10});assert.deepEqual(plain(translateValue('24px 18px',{width:200,height:100})),{x:24,y:18})});
+test('Le point de dépôt est choisi entre les sections, jamais à l’intérieur',()=>{const rects=[{top:100,height:100},{top:220,height:200}];assert.equal(dropIndex(rects,149),0);assert.equal(dropIndex(rects,150),1);assert.equal(dropIndex(rects,319),1);assert.equal(dropIndex(rects,320),2);assert.equal(dropIndex([],100),0)});
+test('Les poignées restent réservées au panel et sont absentes du site exporté',async()=>{const d=JSON.parse(await readFile(new URL('../data/initial.json',import.meta.url),'utf8').catch(()=>readFile(new URL('../seed/site.json',import.meta.url),'utf8')));assert.ok(renderSite(d,d.pages[0],{editor:true,nonce:'test'}).includes('/admin/canvas-controls.js'));assert.ok(!renderSite(d,d.pages[0],{exported:true}).includes('canvas-controls'));assert.ok(!renderSite(d,d.pages[0]).includes('canvas-controls'))});
