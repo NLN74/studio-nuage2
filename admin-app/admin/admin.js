@@ -5,6 +5,7 @@ import {moveMapPosition} from './map-position.js';
 import {createMapEditor} from './map-editor.js';
 import {appearancePanel,styleFromControl} from './appearance.js';
 import {patchDocument,documentStyles} from './editing.js';
+import {coachCard,coachesSection} from './coaches.js';
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let doc,token,pageId,selection=null,outline=[],device='mobile',view='editor',tab='content',dirty=false,undoStack=[],redoStack=[],media=[],mediaTarget=null,pendingCommand=false,liveAt=null,loadingFrame=false;
@@ -129,19 +130,32 @@ function navigate(id){if(inlineTransaction){finishInlinePreview().then(()=>navig
 function emptyInspector(){$('#inspector').innerHTML='<div class="inspector-empty"><h2>Sélectionnez un élément</h2><p>Cliquez dans l’aperçu.</p></div>'}
 
 const field=(label,key,value,type='text',extra='')=>`<label>${label}<input data-field="${key}" type="${type}" value="${esc(value)}" ${extra}></label>`;
+function collectionPanel(s){return (s.collections||[]).map(c=>{
+ const index=c.items.findIndex(item=>item.id===c.itemId);
+ return `<div class="field-group collection-tools"><h3>${esc(c.label)}</h3><button class="button-secondary full-button" data-collection="add" data-group="${esc(c.id)}" data-kind="${c.kind}">+ ${esc(c.add)}</button>${c.itemId?`<button class="collection-select" data-select="${esc(c.itemId)}">Modifier ${c.kind==='coach'?'la fiche coach':'la carte entière'} →</button><div class="tiny-actions"><button data-collection="up" data-group="${esc(c.id)}" data-kind="${c.kind}" data-item="${esc(c.itemId)}" ${index===0?'disabled':''}>← Avant</button><button data-collection="down" data-group="${esc(c.id)}" data-kind="${c.kind}" data-item="${esc(c.itemId)}" ${index===c.items.length-1?'disabled':''}>Après →</button></div><button class="collection-remove" data-collection="delete" data-group="${esc(c.id)}" data-kind="${c.kind}" data-item="${esc(c.itemId)}" ${c.items.length<2?'disabled':''}>${esc(c.remove)}</button>`:`<div class="collection-list">${c.items.map(item=>`<button data-select="${esc(item.id)}">${esc(item.name)} →</button>`).join('')}</div>`}</div>`;
+ }).join('')}
+function coachPanel(s){const c=s.coach;return `<div class="field-group coach-fields"><h3>Fiche coach</h3><button class="related-image" data-coach-photo="${esc(c.imageId)}"><img src="${esc(c.src)}" alt="${esc(c.alt)}"><span>Changer la photo →</span></button><label>Nom de l’enseignant<input data-coach-field="name" maxlength="100" value="${esc(c.name)}"></label>${[0,1,2].map(i=>`<label>Mot ${i+1}<input data-coach-field="word-${i}" maxlength="45" value="${esc(c.words[i]||'')}"></label>`).join('')}</div>`}
+function infoPanel(s){
+ const image=s.imageInfo,entry=media.find(item=>item.url===s.src),format=(s.src||'').split('?')[0].split('.').pop()?.toUpperCase();
+ return `<div class="field-group"><h3>Dimensions affichées</h3><dl class="element-info"><dt>Largeur</dt><dd>${Math.round(s.rect.w)} px</dd><dt>Hauteur</dt><dd>${Math.round(s.rect.h)} px</dd></dl></div>${image?`<div class="field-group"><h3>Photo d’origine</h3><dl class="element-info"><dt>Dimensions</dt><dd>${image.width&&image.height?image.width+' × '+image.height+' px':'Image en cours de chargement'}</dd><dt>Format</dt><dd>${esc(format||'—')}</dd><dt>Poids</dt><dd>${entry?entry.size>=1048576?(entry.size/1048576).toFixed(1)+' Mo':Math.max(1,Math.round(entry.size/1024))+' Ko':'Non disponible'}</dd></dl></div>`:''}`;
+}
 function renderInspector(){
  if(!selection)return emptyInspector();const s=selection;
  let body='';
  if(tab==='content'){
+  if(s.className.split(/\s+/).includes('studio-map'))body+=`<div class="field-group"><h3>Adresse du studio</h3><button id="edit-map-address" class="button-secondary full-button">Modifier l’adresse →</button></div>`;
+  if(s.coach?.id===s.id)body+=coachPanel(s);
   if(s.isText)body+=`<div class="field-group"><h3>Ce qui est écrit</h3><label>Votre texte<textarea id="text-value" rows="5">${esc(s.text)}</textarea></label></div>`;
   if(s.isImage)body+=`<div class="field-group"><h3>Image</h3><img class="image-thumb" src="${esc(s.src)}" alt="Aperçu de l’image sélectionnée"><button id="replace-image" class="button-secondary full-button">Changer cette photo</button>${field('Décrire la photo en quelques mots','alt',s.alt)}<details class="simple-details"><summary>Utiliser le lien d’une image</summary>${field('Lien de l’image','src',s.src)}</details></div>`;
-  if(!s.isImage&&s.images?.length)body+=`<div class="field-group"><h3>${s.images.length>1?'Les photos de ce bloc':'La photo de ce bloc'}</h3>${s.images.map(img=>`<button class="related-image" data-select-image="${img.id}"><img src="${esc(img.src)}" alt="${esc(img.alt)}"><span>Modifier cette photo →</span></button>`).join('')}</div>`;
+  if(!s.isImage&&s.coach?.id!==s.id&&s.images?.length)body+=`<div class="field-group"><h3>${s.images.length>1?'Les photos de ce bloc':'La photo de ce bloc'}</h3>${s.images.map(img=>`<button class="related-image" data-select-image="${img.id}"><img src="${esc(img.src)}" alt="${esc(img.alt)}"><span>Modifier cette photo →</span></button>`).join('')}</div>`;
   if(s.tag==='a'||s.href)body+=`<div class="field-group"><h3>Lien</h3>${field('Page ou lien à ouvrir','href',s.href)}<label>Ou choisir une page<select id="link-page"><option value="">Choisir une page…</option>${doc.pages.map(p=>`<option value="${p.path}">${esc(p.name)}</option>`).join('')}</select></label></div>`;
+  body+=collectionPanel(s);
   body+=`<details class="simple-details"><summary>Déplacer, copier ou supprimer cet élément</summary><div class="field-group"><h3>Organiser cet élément</h3><div class="tiny-actions"><button data-command="parent">Modifier le bloc autour ↑</button><button data-command="duplicate">Dupliquer</button><button data-command="hide">${s.hidden?'Afficher':'Masquer'}</button><button data-command="move" data-direction="up">Monter ↑</button><button data-command="move" data-direction="down">Descendre ↓</button></div><button id="insert-after" class="button-secondary full-button">+ Ajouter un bloc après</button></div>${!(s.global&&['header','footer'].includes(s.tag))?'<button id="delete-element" class="button-danger full-button">Supprimer cet élément</button>':''}</details>`;
  }
  if(tab==='style')body+=appearancePanel(s,device,device==='mobile'?((s.global?doc.global.mobileCss:page().mobileCss)?.[s.id]||{}):{});
+ if(tab==='info')body+=infoPanel(s);
  if(tab==='advanced')body+=`<div class="field-group"><h3>Repères</h3>${field('Classes CSS','className',s.className)}<button id="class-apply" class="button-secondary full-button">Appliquer les classes</button></div>${!s.isImage?`<div class="field-group"><h3>HTML intérieur</h3><textarea id="html-value" class="source-code" rows="12">${esc(s.html)}</textarea><button id="html-apply" class="button-secondary full-button">Remplacer le HTML</button></div>`:''}`;
- $('#inspector').innerHTML=`<div class="inspector-head">${s.global?'<span class="tiny" title="Commun aux pages">Partagé</span>':''}<h2>${s.isImage?'Photo':s.isText?'Texte':'Bloc'}</h2><small>${esc(s.name)}</small></div><div class="tabs"><button data-tab="content" class="${tab==='content'?'active':''}">Contenu</button><button data-tab="style" class="${tab==='style'?'active':''}">Taille et couleurs</button><button data-tab="advanced" class="${tab==='advanced'?'active':''}">Options</button></div><div class="inspector-body">${body}</div>`;
+ $('#inspector').innerHTML=`<div class="inspector-head">${s.global?'<span class="tiny" title="Commun aux pages">Partagé</span>':''}<h2>${s.coach?.id===s.id?'Coach':s.isImage?'Photo':s.isText?'Texte':'Bloc'}</h2><small>${esc(s.name)}</small></div><div class="tabs"><button data-tab="content" class="${tab==='content'?'active':''}">Contenu</button><button data-tab="style" class="${tab==='style'?'active':''}">Taille et couleurs</button><button data-tab="info" class="${tab==='info'?'active':''}">Infos</button><button data-tab="advanced" class="${tab==='advanced'?'active':''}">Options</button></div><div class="inspector-body">${body}</div>`;
 }
 window.addEventListener('message',e=>{
  if(e.origin!==location.origin||e.source!==frame.contentWindow||e.data?.source!=='nuage-preview')return;const m=e.data;if(loadingFrame)return;if(handleInlineMessage(m)||handleCanvasMessage(m))return;
@@ -155,6 +169,7 @@ window.addEventListener('message',e=>{
  if(m.type==='deselected'){endLiveEdit();selection=null;emptyInspector()}
  if(m.type==='ack'){settlePreview(m.seq)}
  if(m.type==='ready'||m.type==='changed'){
+  if(m.cssClones?.length){for(const pair of m.cssClones){const styles=page().mobileCss?.[pair.from]||doc.global.mobileCss?.[pair.from];if(styles)(page().mobileCss??={})[pair.to]=structuredClone(styles)}message('css',{css:themeCSS(doc,page()),refreshSelection:false})}
   if(m.type==='ready'||!m.live&&(!m.seq||m.seq>=latestMutation)){doc.global.header=m.parts.header;doc.global.footer=m.parts.footer;page().html=m.parts.html}
   if(!m.seq||m.seq>=latestMutation){outline=m.outline;renderOutline()}
   if(m.type==='changed'){dirty=true;settlePreview(m.seq);status()}
@@ -169,6 +184,7 @@ function undo(redo=false){if(mapMoving)return;addressEditor.cancel();if(inlineTr
 function modal(html){$('#modal-body').innerHTML=html;$('#modal').showModal()}
 const closeModal=()=>$('#modal').close();
 const templates=[
+ {id:'coaches',name:'Les coachs',note:'Portrait, nom et trois mots',mini:'◯',html:coachesSection()},
  {id:'heading',name:'Titre libre',note:'À ajouter dans un bloc',mini:'T',html:'<h2>Votre nouveau titre.</h2>'},
  {id:'paragraph',name:'Paragraphe',note:'À ajouter dans un bloc',mini:'¶',html:'<p>Votre nouveau paragraphe.</p>'},
  {id:'button',name:'Bouton / lien',note:'Destination modifiable',mini:'↗',html:'<a class="button" href="/site/contact.html">Votre bouton</a>'},
@@ -188,7 +204,7 @@ function pageSettings(isNew=false){const p=page();modal(`<p class="eyebrow">${is
 async function loadMedia(target=null){mediaTarget=target;try{media=await(await api('media')).json();renderMedia(target)}catch(e){toast(e.message,true)}}
 function mediaHTML(target){return `<div class="view-heading"><div><h1>${target?'Choisir une photo':'Photos'}</h1></div><button class="button-primary" id="upload-button">+ Importer des images</button></div><div class="media-toolbar"><input id="media-search" aria-label="Rechercher une image" placeholder="Rechercher une image…"><select id="media-filter" aria-label="Filtrer les images"><option value="all">Toutes les images</option><option value="uploads">Mes imports</option></select></div><div id="media-grid" class="media-grid"></div>`}
 function renderMedia(target){if(target)modal(mediaHTML(target));else $('#media-view').innerHTML=mediaHTML(false);filterMedia()}
-function mediaLabel(m){const key=m.name.replace(/-\d{3,4}\.(?:webp|png|jpg)$/,'').replace(/\.[^.]+$/,'');return ({'hero-noir':'Photo d’accueil — noir et blanc','mezzanine-presences':'Le studio — la mezzanine','movement-light':'Le mouvement — les pieds','movement-collective':'Les cours — mouvement collectif','accessory-ball':'Accessoires — le ballon','accessory-wood':'Accessoires — bâton et blocs','logo-nuage-transparent':'Logo Nuage — fond transparent','architecture-noir':'Architecture — noir et blanc','hero-immersive':'Autre photo d’accueil','mezzanine-duo':'Mezzanine — deux silhouettes','mezzanine-sculpt':'Mezzanine — autre ambiance','movement-noir':'Pratique — noir et blanc','studio-detail':'Détails du studio','studio-mats':'Les tapis du studio'})[key]||key.replace(/-[a-f0-9]{10}$/,'').replaceAll('-',' ')}
+function mediaLabel(m){const key=m.name.replace(/-\d{3,4}\.(?:webp|png|jpg)$/,'').replace(/\.[^.]+$/,'');return ({'coach-camille-ia':'Camille — portrait IA','coach-ines-ia':'Inès — portrait IA','coach-gabriel-ia':'Gabriel — portrait IA','hero-noir':'Photo d’accueil — noir et blanc','mezzanine-presences':'Le studio — la mezzanine','movement-light':'Le mouvement — les pieds','movement-collective':'Les cours — mouvement collectif','accessory-ball':'Accessoires — le ballon','accessory-wood':'Accessoires — bâton et blocs','logo-nuage-transparent':'Logo Nuage — fond transparent','architecture-noir':'Architecture — noir et blanc','hero-immersive':'Autre photo d’accueil','mezzanine-duo':'Mezzanine — deux silhouettes','mezzanine-sculpt':'Mezzanine — autre ambiance','movement-noir':'Pratique — noir et blanc','studio-detail':'Détails du studio','studio-mats':'Les tapis du studio'})[key]||key.replace(/-[a-f0-9]{10}$/,'').replaceAll('-',' ')}
 function filterMedia(){const q=($('#media-search')?.value||'').toLowerCase(),uploads=$('#media-filter')?.value==='uploads';const list=media.filter(m=>(!uploads||m.url.includes('/uploads/'))&&(!/-[0-9]{3,4}\.webp$/.test(m.name)||/-1200\.webp$/.test(m.name)||m.url.includes('/uploads/'))&&m.name!=='logo-original.jpg'&&(m.name+' '+mediaLabel(m)).toLowerCase().includes(q));$('#media-grid').innerHTML=list.map(m=>`<button class="media-card" data-media="${esc(m.url)}" title="Choisir : ${esc(mediaLabel(m))}"><img loading="lazy" src="${esc(m.url)}" alt="${esc(mediaLabel(m))}" ${m.name.includes('logo')?'style="background:#222;object-fit:contain;padding:12px"':''}><span>${esc(mediaLabel(m))}</span><small>${m.url.includes('/uploads/')?'Votre photo':'Photo du site'}</small></button>`).join('')||'<p class="field-help">Aucune image. Importez une photographie pour commencer.</p>'}
 
 async function upload(files){let count=0;for(const file of files){try{if(file.size>15*1024*1024)throw Error(file.name+' dépasse 15 Mo.');const data=await new Promise((resolve,reject)=>{const reader=new FileReader;reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file)});const item=await(await api('upload',{name:file.name,data})).json();media.unshift(item);count++}catch(e){toast(e.message,true)}}filterMedia();if(count)toast(count+' photo(s) importée(s).')}
@@ -224,14 +240,17 @@ document.addEventListener('click',async e=>{
   if(b.dataset.select){message('select',{id:b.dataset.select});return}
   if(b.dataset.move){remember();message('move',{id:b.dataset.move,direction:b.dataset.direction});return}
   if(b.dataset.device){endLiveEdit();device=b.dataset.device;$$('[data-device]').forEach(x=>x.classList.toggle('active',x===b));resize();if(view==='theme')renderTheme();else renderInspector();return}
-  if(b.dataset.tab){endLiveEdit();tab=b.dataset.tab;renderInspector();return}
+  if(b.dataset.tab){endLiveEdit();tab=b.dataset.tab;if(tab==='info'&&selection?.isImage){try{media=await(await api('media')).json()}catch{}}renderInspector();return}
+  if(b.dataset.coachPhoto){message('select',{id:b.dataset.coachPhoto});await loadMedia(b.dataset.coachPhoto);return}
+  if(b.dataset.collection){const c=selection?.collections?.find(c=>c.id===b.dataset.group&&c.kind===b.dataset.kind);if(!c)return;const data={groupId:c.id,kind:c.kind,action:b.dataset.collection,itemId:b.dataset.item||c.itemId};if(data.action==='add'&&c.kind==='coach')data.html=coachCard();if(data.action==='delete')confirmAction(c.remove+' ?', 'Vous pourrez annuler cette action avec la flèche en haut du panneau.',()=>command('collection',data));else command('collection',data);return}
   if(b.dataset.command){if(b.dataset.command==='parent')message('parent',{id:selection.id});else command(b.dataset.command,{direction:b.dataset.direction});return}
   if(b.dataset.template){command('add',{html:templates.find(t=>t.id===b.dataset.template).html,position:$('#insert-position')?.value||'after'});closeModal();return}
-  if(b.dataset.media){if(mediaTarget){if(mediaTarget.kind==='background'){endLiveEdit();liveStyles({'background-image':'url("'+b.dataset.media+'")','background-size':'cover','background-position':'center','background-repeat':'no-repeat'},'background-image');endLiveEdit()}else command('image',{url:b.dataset.media});closeModal();mediaTarget=null}else{modal(`<h2>Votre image.</h2><img src="${esc(b.dataset.media)}" style="width:100%;max-height:440px;object-fit:contain;background:#eee"><p class="small-note">${esc(b.dataset.media)}</p><p>Pour l’utiliser : sélectionnez une image sur le site, puis choisissez « Changer cette photo ».</p>`)}return}
+  if(b.dataset.media){if(mediaTarget){if(mediaTarget.kind==='background'){endLiveEdit();liveStyles({'background-image':'url("'+b.dataset.media+'")','background-size':'cover','background-position':'center','background-repeat':'no-repeat'},'background-image');endLiveEdit()}else command('image',{url:b.dataset.media,id:typeof mediaTarget==='string'?mediaTarget:selection?.id});closeModal();mediaTarget=null}else{modal(`<h2>Votre image.</h2><img src="${esc(b.dataset.media)}" style="width:100%;max-height:440px;object-fit:contain;background:#eee"><p class="small-note">${esc(b.dataset.media)}</p><p>Pour l’utiliser : sélectionnez une image sur le site, puis choisissez « Changer cette photo ».</p>`)}return}
   if(b.dataset.clearStyle){endLiveEdit();liveStyles({[b.dataset.clearStyle]:'none'},'clear-'+b.dataset.clearStyle);endLiveEdit();await waitForPreview();renderInspector();return}
   if(b.dataset.restore){const rev=Number(b.dataset.restore);confirmAction('Restaurer cette version ?','Le brouillon actuel sera remplacé. Vos versions déjà enregistrées resteront disponibles.',async()=>{try{const r=await(await api('restore',{revision:rev})).json();addressEditor.cancel();doc=r.document;dirty=false;undoStack=[];redoStack=[];if(!doc.pages.some(p=>p.id===pageId))pageId=doc.pages[0].id;syncPreview();status();renderHistory();toast('Version restaurée.')}catch(e){toast(e.message,true)}});return}
   if(b.hasAttribute('data-go-editor'))return setView('editor');
   switch(b.id){
+   case 'edit-map-address':await finishInlinePreview();setView('settings');$('[data-field="setting-street"]').focus();break;
    case 'save':case 'keep-draft':await save();break;
    case 'apply':await apply();break;
    case 'undo':undo();break;case 'redo':undo(true);break;
@@ -273,6 +292,7 @@ function liveThemeInput(el){
 }
 function liveField(el){
  if(!selection)return;
+ if(el.dataset.coachField&&selection.coach?.id===selection.id){const t=document.createElement('template');t.innerHTML=selection.html;const key=el.dataset.coachField,target=key==='name'?t.content.querySelector('[data-coach-name]'):t.content.querySelectorAll('[data-coach-word]')[Number(key.split('-')[1])];if(target){target.textContent=el.value;if(key==='name'){const image=t.content.querySelector('img');if(image)image.alt='Portrait de '+el.value}liveEdit({type:'html',html:t.innerHTML},'coach-'+key)}return;}
  if(el.id==='text-value'){liveEdit({type:'text',value:el.value,mode:selection.textMode},'text');return}
  const key=el.dataset.field;
  if(key==='alt'){liveEdit({type:'attribute',attrs:{alt:el.value}},'alt');return}
@@ -303,7 +323,7 @@ document.addEventListener('change',async e=>{
  if(el.id==='image-upload'){await upload(Array.from(el.files));el.value=''}
  if(el.id==='import-data'){try{const imported=JSON.parse(await el.files[0].text());if(imported.version!==1||!imported.pages?.length)throw Error('Fichier de projet invalide.');confirmAction('Importer ce projet ?','Le brouillon courant sera remplacé. Les images doivent déjà être présentes dans la médiathèque.',()=>{addressEditor.cancel();remember();imported.revision=doc.revision;doc=imported;pageId=doc.pages[0].id;navigate(pageId);status();toast('Projet importé dans le brouillon.')})}catch(err){toast(err.message,true)}el.value=''}
 });
-document.addEventListener('focusout',e=>{if(e.target.matches('[data-live],#text-value,[data-field="alt"],[data-field="href"],[data-field="src"],[data-theme],#global-css'))endLiveEdit()});
+document.addEventListener('focusout',e=>{if(e.target.matches('[data-coach-field],[data-live],#text-value,[data-field="alt"],[data-field="href"],[data-field="src"],[data-theme],#global-css'))endLiveEdit()});
 document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='s'){e.preventDefault();apply()}if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='z'&&!e.target.matches('input,textarea')){e.preventDefault();undo(e.shiftKey)}});
 window.addEventListener('beforeunload',e=>{if(dirty||addressEditor.isPending()){e.preventDefault();e.returnValue=''}});
 $$('[data-device]').forEach(b=>b.classList.toggle('active',b.dataset.device===device));

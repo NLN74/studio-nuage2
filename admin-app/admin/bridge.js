@@ -26,7 +26,7 @@
   return clone;
  }
  const assign=()=>{for(const e of document.querySelectorAll('.site-header,.site-header *,#main *, .site-footer,.site-footer *'))if(!e.closest('[data-runtime-map]')&&!e.dataset.nid)e.dataset.nid=newId()};
- const names={'image-link':'Cadre de la photo','logo-crop':'Cadre du logo','home-hero':'Grande photo d’accueil','manifesto':'Texte d’introduction','home-practices':'Liste des cours','offerings':'Photos du studio','local-section':'Le studio à Sevrier','accessories':'Accessoires','home-planning-link':'Lien vers le planning','faq-section':'Questions fréquentes','cta-panel':'Invitation à réserver','page-intro':'Titre de la page','wide-image':'Grande photo du studio','story':'Présentation','values':'Nos valeurs','course-feature':'Présentation des cours','course-types':'Les cinq cours','eversports-section':'Planning et réservations','pricing-section':'Les formules et tarifs','contact-grid':'Contact Instagram','legal-copy':'Informations légales','breadcrumb':'Repère de navigation'};
+ const names={'image-link':'Cadre de la photo','logo-crop':'Cadre du logo','coaches-section':'Les coachs','coach-card':'Fiche coach','home-hero':'Grande photo d’accueil','manifesto':'Texte d’introduction','home-practices':'Liste des cours','offerings':'Photos du studio','local-section':'Le studio à Sevrier','accessories':'Accessoires','home-planning-link':'Lien vers le planning','faq-section':'Questions fréquentes','cta-panel':'Invitation à réserver','page-intro':'Titre de la page','wide-image':'Grande photo du studio','story':'Présentation','values':'Nos valeurs','course-feature':'Présentation des cours','course-types':'Les cinq cours','eversports-section':'Planning et réservations','pricing-section':'Les formules et tarifs','contact-grid':'Contact Instagram','legal-copy':'Informations légales','breadcrumb':'Repère de navigation'};
  const title=e=>e.dataset.label||Object.entries(names).find(([key])=>e.classList.contains(key))?.[1]||(e.tagName==='IMG'?(e.alt||'Photo'):'')||(/^(H[1-6]|P|A|BUTTON)$/.test(e.tagName)?(e.innerText||e.textContent).trim().replace(/\s+/g,' ').slice(0,48):'')||e.querySelector('h1,h2,h3')?.textContent?.trim().slice(0,48)||e.getAttribute('aria-label')||e.className?.toString().split(' ')[0]||e.tagName.toLowerCase();
  function outline(){return [{id:document.querySelector('.site-header').dataset.nid,name:'En-tête partagé',global:true},...Array.from(document.querySelector('#main').children).map(e=>({id:e.dataset.nid,name:title(e),tag:e.tagName.toLowerCase(),hidden:e.dataset.cmsHidden==='true'})),{id:document.querySelector('.site-footer').dataset.nid,name:'Pied de page partagé',global:true}]}
  function parts(){return {header:contentCopy(document.querySelector('.site-header')).outerHTML,footer:contentCopy(document.querySelector('.site-footer')).outerHTML,html:contentCopy(document.querySelector('#main')).innerHTML}}
@@ -104,22 +104,75 @@
   }
   else if((event.metaKey||event.ctrlKey)&&['b','i','u'].includes(event.key.toLowerCase()))event.preventDefault();
  },true);
- function snapshot(options={}){send('changed',{parts:options.live?null:parts(),outline:outline(),seq:options.seq,live:!!options.live});if(selected&&document.contains(selected))select(selected,{preserveInspector:!!options.live,seq:options.seq})}
+ function snapshot(options={}){send('changed',{cssClones:options.cssClones,parts:options.live?null:parts(),outline:outline(),seq:options.seq,live:!!options.live});if(selected&&document.contains(selected))select(selected,{preserveInspector:!!options.live,seq:options.seq})}
  function select(e,options={}){
   if(!e)return;
   let details=e.closest('details');if(e.matches('summary'))details=details?.parentElement?.closest('details');
   for(;details;details=details.parentElement?.closest('details'))openDetails(details,true);
   selected=e;const s=getComputedStyle(e),r=e.getBoundingClientRect();
-  send('selected',{preserveInspector:!!options.preserveInspector,seq:options.seq,selection:{id:e.dataset.nid,tag:e.tagName.toLowerCase(),name:title(e),textMode:e.matches('.price,summary,figcaption')?'direct':'whole',text:e.matches('.price,summary,figcaption')?Array.from(e.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim():(e.innerText||e.textContent),html:contentCopy(e).innerHTML,src:e.getAttribute('src')||'',alt:e.getAttribute('alt')||'',href:e.getAttribute('href')||'',className:e.getAttribute('class')||'',hidden:e.dataset.cmsHidden==='true',isText:/^(H[1-6]|P|A|BUTTON|LI|SUMMARY|FIGCAPTION|SPAN|ADDRESS|LABEL)$/.test(e.tagName)&&!e.matches('.logo-crop,.image-link'),isImage:e.tagName==='IMG',images:Array.from(e.querySelectorAll('img').length?e.querySelectorAll('img'):(e.closest('section')?.querySelectorAll('img')||[])).slice(0,6).map(img=>({id:img.dataset.nid,src:img.getAttribute('src'),alt:img.alt})),global:!!e.closest('.site-header,.site-footer'),styles:Object.fromEntries(['font-size', 'font-family', 'font-weight', 'font-style', 'text-transform', 'line-height', 'letter-spacing', 'text-align', 'color', 'background-color', 'background-image', 'background-size', 'background-position', 'background-repeat', 'opacity', 'width', 'height', 'max-width', 'min-height', 'max-height', 'min-width', 'box-sizing', 'translate', 'padding-top', 'padding-bottom', 'padding-left', 'padding-right', 'margin-top', 'margin-bottom', 'margin-left', 'margin-right', 'border-radius', 'border-top-left-radius', 'border-top-right-radius', 'border-bottom-left-radius', 'border-bottom-right-radius', 'border-style', 'border-top-width', 'border-color', 'border-top-color', 'box-shadow', 'gap', 'object-fit', 'object-position', 'display', 'grid-template-columns', 'flex-direction', 'justify-content', 'align-items', 'flex-wrap', 'position', 'top', 'bottom', 'left', 'right', 'z-index', 'overflow', 'filter'].map(k=>[k,s.getPropertyValue(k)])),inline:Object.fromEntries(Array.from(e.style).map(k=>[k,e.style.getPropertyValue(k)])),rect:{x:r.x,y:r.y,w:r.width,h:r.height},parent:e.parentElement?.dataset.nid||null}});
+  send('selected',{preserveInspector:!!options.preserveInspector,seq:options.seq,selection:{collections:collectionsFor(e),coach:coachInfo(e),imageInfo:e.tagName==='IMG'?{width:e.naturalWidth,height:e.naturalHeight,source:e.currentSrc||e.src}:null,id:e.dataset.nid,tag:e.tagName.toLowerCase(),name:title(e),textMode:e.matches('.price,summary,figcaption')?'direct':'whole',text:e.matches('.price,summary,figcaption')?Array.from(e.childNodes).filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim():(e.innerText||e.textContent),html:contentCopy(e).innerHTML,src:e.getAttribute('src')||'',alt:e.getAttribute('alt')||'',href:e.getAttribute('href')||'',className:e.getAttribute('class')||'',hidden:e.dataset.cmsHidden==='true',isText:/^(H[1-6]|P|A|BUTTON|LI|SUMMARY|FIGCAPTION|SPAN|ADDRESS|LABEL)$/.test(e.tagName)&&!e.matches('.logo-crop,.image-link'),isImage:e.tagName==='IMG',images:Array.from(e.querySelectorAll('img').length?e.querySelectorAll('img'):(e.closest('section')?.querySelectorAll('img')||[])).filter(img=>!img.closest('[data-runtime-map]')).slice(0,6).map(img=>({id:img.dataset.nid,src:img.getAttribute('src'),alt:img.alt})),global:!!e.closest('.site-header,.site-footer'),styles:Object.fromEntries(['font-size', 'font-family', 'font-weight', 'font-style', 'text-transform', 'line-height', 'letter-spacing', 'text-align', 'color', 'background-color', 'background-image', 'background-size', 'background-position', 'background-repeat', 'opacity', 'width', 'height', 'max-width', 'min-height', 'max-height', 'min-width', 'box-sizing', 'translate', 'padding-top', 'padding-bottom', 'padding-left', 'padding-right', 'margin-top', 'margin-bottom', 'margin-left', 'margin-right', 'border-radius', 'border-top-left-radius', 'border-top-right-radius', 'border-bottom-left-radius', 'border-bottom-right-radius', 'border-style', 'border-top-width', 'border-color', 'border-top-color', 'box-shadow', 'gap', 'object-fit', 'object-position', 'display', 'grid-template-columns', 'flex-direction', 'justify-content', 'align-items', 'flex-wrap', 'position', 'top', 'bottom', 'left', 'right', 'z-index', 'overflow', 'filter'].map(k=>[k,s.getPropertyValue(k)])),inline:Object.fromEntries(Array.from(e.style).map(k=>[k,e.style.getPropertyValue(k)])),rect:{x:r.x,y:r.y,w:r.width,h:r.height},parent:e.parentElement?.dataset.nid||null}});
   canvas.update(e);
  }
  function refreshBox(options={}){if(selected&&document.contains(selected))select(selected,options)}
  const sanitize=html=>{const t=document.createElement('template');t.innerHTML=html;for(const e of t.content.querySelectorAll('*')){if(/^(SCRIPT|IFRAME|OBJECT|EMBED|BASE|META|LINK|FORM)$/.test(e.tagName)){e.remove();continue}for(const a of Array.from(e.attributes))if(/^on/i.test(a.name)||a.name==='srcdoc'||/^(?:javascript|vbscript):/i.test(a.value.trim()))e.removeAttribute(a.name)}return t.content};
  const resetIds=e=>{e.removeAttribute('data-nid');for(const c of e.querySelectorAll('[data-nid]'))c.removeAttribute('data-nid')};
+ const collectionTypes=[
+  {selector:'.coach-grid',item:'.coach-card',kind:'coach',label:'Les coachs',add:'Ajouter un coach',remove:'Supprimer ce coach'},
+  {selector:'.pricing-grid',item:'article',kind:'price',label:'Les tarifs',add:'Ajouter un tarif',remove:'Supprimer ce tarif'},
+  {selector:'.faq-list,.cms-section',item:'details',kind:'faq',label:'Les questions',add:'Ajouter une question',remove:'Supprimer cette question'},
+  {selector:'.course-types',item:'article',kind:'course',label:'Les cours',add:'Ajouter un cours',remove:'Supprimer ce cours'},
+  {selector:'.practice-index',item:'a',kind:'practice',label:'Les pratiques',add:'Ajouter une pratique',remove:'Supprimer cette pratique'},
+  {selector:'.values',item:'article',kind:'value',label:'Les cartes',add:'Ajouter une carte',remove:'Supprimer cette carte'},
+  {selector:'.accessories-grid',item:'figure',kind:'photo',label:'La galerie',add:'Ajouter une photo',remove:'Supprimer cette photo'},
+  {selector:'.editorial-grid,.cms-columns',item:'article,figure',kind:'card',label:'Les cartes',add:'Ajouter une carte',remove:'Supprimer cette carte'},
+  {selector:'#main ul:not(.coach-words),#main ol',item:'li',kind:'line',label:'Les lignes',add:'Ajouter une ligne',remove:'Supprimer cette ligne'}
+ ];
+ function collectionFor(group,kind){
+  const config=collectionTypes.find(c=>c.kind===kind&&group.matches(c.selector));
+  return config?{...config,group,items:Array.from(group.children).filter(e=>e.matches(config.item))}:null;
+ }
+ function collectionsFor(element){
+  return collectionTypes.flatMap(config=>{
+   const group=element.closest(config.selector);if(!group?.closest('#main'))return [];
+   const collection=collectionFor(group,config.kind);if(!collection?.items.length)return [];
+   const item=collection.items.find(item=>item===element||item.contains(element));
+   return [{id:group.dataset.nid,kind:config.kind,label:config.label,add:config.add,remove:config.remove,itemId:item?.dataset.nid||null,items:collection.items.map(item=>({id:item.dataset.nid,name:(item.querySelector('[data-coach-name],h2,h3,summary')?.textContent||item.getAttribute('aria-label')||item.textContent||'Élément').trim().replace(/\s+/g,' ').slice(0,48)}))}];
+  });
+ }
+ function coachInfo(element){
+  const coach=element.closest('.coach-card');if(!coach)return null;const image=coach.querySelector('img');
+  return {id:coach.dataset.nid,name:coach.querySelector('[data-coach-name]')?.textContent||'',words:Array.from(coach.querySelectorAll('[data-coach-word]')).map(e=>e.textContent),imageId:image?.dataset.nid,src:image?.getAttribute('src')||'',alt:image?.alt||''};
+ }
+ function collectionChange(m){
+  const group=byId(m.groupId),collection=group&&collectionFor(group,m.kind);
+  if(!collection?.items.length)throw Error('Sélectionnez à nouveau une carte de ce groupe.');
+  const current=collection.items.find(item=>item.dataset.nid===m.itemId)||collection.items.at(-1);let cssClones=[];
+  if(m.action==='add'){
+   const template=m.html?sanitize(m.html).firstElementChild:contentCopy(current);
+   if(!template?.matches(collection.item))throw Error('Cette carte ne correspond pas à ce groupe.');
+   const oldIds=[template,...template.querySelectorAll('[data-nid]')].map(e=>e.dataset.nid);resetIds(template);
+   for(const node of [template,...template.querySelectorAll('[id]')])node.removeAttribute('id');
+   if(m.kind==='price'){template.classList.remove('featured');const name=template.querySelector('h2,h3');if(name)name.textContent='Nouvelle formule';}
+   if(m.kind==='faq'){template.open=false;const summary=template.querySelector('summary'),text=Array.from(summary.childNodes).find(n=>n.nodeType===3);if(text)text.textContent='Votre nouvelle question ?';const answer=template.querySelector('p');if(answer)answer.textContent='Votre réponse.';}
+   if(m.kind==='practice'){const name=template.querySelector('.practice-name');if(name)name.textContent='Nouvelle pratique';}
+   if(m.kind==='course'){const name=template.querySelector('h2,h3');if(name)name.textContent='Nouveau cours';}
+   current.after(template);assign();selected=template;cssClones=[template,...template.querySelectorAll('[data-nid]')].flatMap((e,i)=>oldIds[i]?[{from:oldIds[i],to:e.dataset.nid}]:[]);
+  }else if(m.action==='delete'){
+   if(collection.items.length<2)throw Error('Gardez au moins une carte dans ce groupe. Vous pouvez masquer ou supprimer toute sa section.');
+   const index=collection.items.indexOf(current);current.remove();selected=collection.items[index+1]||collection.items[index-1];
+  }else if(m.action==='up'||m.action==='down'){
+   const index=collection.items.indexOf(current),neighbor=collection.items[index+(m.action==='up'?-1:1)];
+   if(neighbor){if(m.action==='up')neighbor.before(current);else neighbor.after(current)}selected=current;
+  }else throw Error('Action de carte inconnue.');
+  if(m.kind==='practice')collection.group.querySelectorAll('.practice-number').forEach((e,i)=>e.textContent=String(i+1).padStart(2,'0'));
+  if(m.kind==='course')collection.group.querySelectorAll('.value-number').forEach((e,i)=>e.textContent=String(i+1).padStart(2,'0'));
+  snapshot({...m,cssClones});selected?.scrollIntoView({block:'center',behavior:'smooth'});
+ }
  window.addEventListener('message',event=>{
   if(event.origin!==location.origin||event.source!==parent||event.data?.source!=='nuage-admin')return;
   const m=event.data;if(m.command==='finish-inline'){finishInline();send('inline-finished',{request:m.request});return}if(inlineSession&&!['editor-scale','css'].includes(m.command))finishInline();let e=m.id?byId(m.id):selected;
   try{
+   if(m.command==='collection'){collectionChange(m);return}
    if(m.command==='select'){select(e);e?.scrollIntoView({behavior:'smooth',block:'center'});return}
    if(m.command==='mode'){editing=m.editing;if(!editing)canvas.clear();else if(selected)canvas.update(selected);return}
    if(m.command==='editor-scale'){canvas.setScale(m.scale);return}
