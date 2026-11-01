@@ -261,3 +261,9 @@
 [data-in-progress="false"] [data-in-progress-only]{display:none!important}
 .provider-pending.progress-panel .progress-caption>.button{margin-top:22px;min-height:46px;font-size:12px;padding:14px 22px}
 @media(max-width:760px){.eversports-prices-section{padding-top:32px}.eversports-prices-heading{display:block;margin-bottom:22px}.eversports-prices-heading .eyebrow{margin-bottom:16px}.eversports-prices-heading h2{font-size:36px}.eversports-prices-slot{min-height:160px}.eversports-prices-slot>p{padding:22px;font-size:12px}}
+
+.progress-visual{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:360px;padding:48px 28px}
+.provider-pending.progress-panel .progress-visual>.progress-caption{width:100%;max-width:720px;padding-top:22px}
+.provider-pending.progress-panel .progress-visual>.progress-caption p{color:#33332f;font-size:13px;max-width:650px}
+.provider-pending.progress-panel .progress-visual>.progress-caption>.button{margin-top:18px}
+@media(max-width:760px){.progress-visual{min-height:300px;padding:32px 20px}.provider-pending.progress-panel .progress-visual>.progress-caption{padding-top:20px}.provider-pending.progress-panel .progress-visual>.progress-caption p{font-size:12px}.provider-pending.progress-panel .progress-visual>.progress-caption>.button{margin-top:17px;min-height:44px;font-size:11px}}
