@@ -179,3 +179,70 @@
  .pricing-terms-grid h3{font-size:29px}
  .pricing-terms>.text-link{font-size:11px}
 }
+
+/* Portraits de gestes, dans la gamme noir et blanc du studio. */
+.coach-portrait img,.coach-profile-portrait img{filter:grayscale(1);object-position:center}
+
+/* Le planning en attente reste remplacé par Eversports dès sa configuration. */
+.theme-immersive .provider-pending.progress-panel{padding:0;border:0}
+.progress-visual{position:relative;isolation:isolate;min-height:320px;padding:64px 28px;display:grid;place-items:center;overflow:hidden;background:#cbc7c0}
+.progress-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 42%;z-index:-1;opacity:.27;filter:grayscale(1) blur(5px);transform:scale(1.035)}
+.theme-immersive .provider-pending.progress-panel .progress-title{font-family:'Manrope Variable',Arial,sans-serif;font-size:clamp(25px,4.3vw,58px);font-weight:300;line-height:1.55;letter-spacing:.22em;text-transform:uppercase;text-align:center;color:#111;margin:0;padding-left:.22em;max-width:none}
+.progress-title::after{content:'';display:block;width:90px;height:1px;background:currentColor;margin:25px auto 0}
+.provider-pending.progress-panel .progress-caption{padding:25px 0 0;text-align:center}
+.provider-pending.progress-panel .progress-caption p{margin:0 auto;max-width:none;font-size:13px;color:var(--muted)}
+.provider-pending.progress-panel .progress-caption .text-link{margin:13px auto 0;font-size:12px;min-height:36px;display:inline-flex;align-items:center}
+
+/* Les prix mensuels restent dans l’ordre ; FREE IN possède son propre encart. */
+.theme-immersive .pricing-grid.plans-grid:not(.pricing-card-grid){grid-template-columns:repeat(4,minmax(0,1fr))}
+.theme-immersive .pricing-grid.plans-grid:not(.pricing-card-grid)>article{grid-column:auto;border-top:0}
+.theme-immersive .pricing-grid.plans-grid:not(.pricing-card-grid)>article:nth-child(n+2){border-left:1px solid var(--line)}
+.theme-immersive .pricing-grid.plans-grid:not(.pricing-card-grid)>article.featured{border-color:var(--noir)}
+.pricing-card-offer{margin-top:40px}
+.pricing-card-offer>.eyebrow{font-size:10px;letter-spacing:.16em;margin:0 0 17px}
+.theme-immersive .pricing-grid.pricing-card-grid{grid-template-columns:1fr;border:0;margin-top:0}
+.theme-immersive .pricing-card-grid>article.plan-card-flex{display:grid;grid-template-columns:1fr .9fr 1.4fr;gap:36px;align-items:start;grid-column:auto;padding:34px 36px;background:#deded8;border:0}
+.pricing-card-grid .plan-category{min-height:0}
+.theme-immersive .pricing-card-grid h2{font-size:42px;margin:16px 0}
+.pricing-card-grid .plan-commitment{min-height:0;margin:0}
+.theme-immersive .pricing-card-grid .price{font-size:84px}
+.theme-immersive .pricing-card-grid .price-caption{min-height:0;margin-bottom:12px}
+.theme-immersive .pricing-card-grid ul{margin:0 0 20px;border:0;padding:0;font-size:13px}
+.pricing-card-grid .plan-saving{min-height:0;margin:0 0 20px;font-size:11px}
+.theme-immersive .pricing-card-grid .button{max-width:220px;font-size:11px}
+.eversports-access{display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap;margin-top:26px}
+.eversports-access>.button{display:inline-flex;align-items:center;gap:12px;min-height:46px;margin:0;padding:14px 20px;font-size:12px}
+.eversports-access svg{display:block;flex:0 0 16px}
+.eversports-resources{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.eversports-resources>a{display:inline-flex;align-items:center;gap:7px;font-size:11px;line-height:1.7;min-height:36px;color:var(--muted);text-decoration:none}
+.eversports-resources>a:hover{text-decoration:underline;text-underline-offset:4px}
+.progress-caption .eversports-access{justify-content:center;margin-top:20px}
+.provider-pending .progress-caption .eversports-access>.button{margin:0}
+@media(max-width:1100px) and (min-width:761px){
+ .theme-immersive .pricing-grid.plans-grid:not(.pricing-card-grid){grid-template-columns:repeat(2,minmax(0,1fr))}
+ .theme-immersive .pricing-grid.plans-grid:not(.pricing-card-grid)>article{padding:30px}
+ .theme-immersive .pricing-grid.plans-grid:not(.pricing-card-grid)>article:nth-child(2n+1){border-left:0}
+ .theme-immersive .pricing-grid.plans-grid:not(.pricing-card-grid)>article:nth-child(n+3){border-top:1px solid var(--line)}
+ .theme-immersive .pricing-card-grid>article.plan-card-flex{grid-template-columns:1fr 1fr;gap:28px}
+ .pricing-card-grid .plan-card-details{grid-column:1/-1}
+}
+@media(max-width:760px){
+ .progress-visual{min-height:220px;padding:40px 18px}
+ .theme-immersive .provider-pending.progress-panel .progress-title{font-size:clamp(20px,5vw,31px);letter-spacing:.17em;line-height:1.6;white-space:nowrap}
+ .progress-title::after{width:65px;margin-top:22px}
+ .provider-pending.progress-panel .progress-caption{padding-top:20px}
+ .provider-pending.progress-panel .progress-caption p{font-size:12px}
+ .provider-pending.progress-panel .progress-caption .text-link{font-size:11px}
+ .theme-immersive .pricing-grid.plans-grid:not(.pricing-card-grid){grid-template-columns:1fr}
+ .theme-immersive .pricing-grid.plans-grid:not(.pricing-card-grid)>article:nth-child(n+2){border-left:0;border-top:1px solid var(--line)}
+ .pricing-card-offer{margin-top:30px}
+ .theme-immersive .pricing-card-grid>article.plan-card-flex{grid-template-columns:1fr;gap:26px;padding:28px 26px}
+ .theme-immersive .pricing-card-grid h2{font-size:40px}
+ .theme-immersive .pricing-card-grid .price{font-size:78px}
+ .theme-immersive .pricing-card-grid .button{max-width:none;font-size:12px}
+ .eversports-access{align-items:flex-start;gap:12px;margin-top:22px}
+ .eversports-resources{gap:5px 18px}
+ .eversports-resources>a{font-size:10px}
+ .progress-caption .eversports-access{display:flex;flex-direction:column;align-items:center;gap:10px}
+ .progress-caption .eversports-resources{justify-content:center}
+}

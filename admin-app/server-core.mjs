@@ -10,7 +10,8 @@ export function validateDocument(d){
   if(typeof html!=='string'||html.length>2e6||/<\s*(script|iframe|object|embed|base|meta|link|form)\b|\son[a-z]+\s*=|(?:javascript|vbscript)\s*:|srcdoc\s*=/i.test(html))throw Error('Ce contenu contient du code actif non autorisé. Utilisez les réglages dédiés pour Eversports.');
  }
  for(const css of [d.global.css,...d.pages.map(p=>p.css)])if(typeof css!=='string'||/<\/style|@import|expression\s*\(/i.test(css)||css.length>100000)throw Error('Feuille de style invalide.');
- for(const key of ['bookingUrl','scheduleUrl','pricesUrl']){const u=d.global.settings[key];if(u&&(!/^https:\/\//i.test(u)||u.length>2000))throw Error('Les liens Eversports doivent commencer par https://.');}
+ for(const key of ['bookingUrl','scheduleUrl','pricesUrl','profileUrl','appUrl']){const u=d.global.settings[key];if(u&&(!/^https:\/\//i.test(u)||u.length>2000))throw Error('Les liens Eversports doivent commencer par https://.');}
+ if(d.global.settings.scheduleEnabled!==undefined&&typeof d.global.settings.scheduleEnabled!=='boolean')throw Error('Le réglage du planning doit être activé ou désactivé.');
  if(!/^[\w.-]*$/.test(d.global.settings.instagram))throw Error('Identifiant Instagram invalide.');
  if(d.global.settings.scheduleWidgetId&&!/^[\w-]+$/.test(d.global.settings.scheduleWidgetId))throw Error('Identifiant de widget invalide.');
  const point=d.global.settings.mapLocation;if(point&&(!Number.isFinite(point.lat)||!Number.isFinite(point.lng)||Math.abs(point.lat)>85||Math.abs(point.lng)>180||typeof point.label!=='string'||point.label.length>400))throw Error('Localisation de la carte invalide.');

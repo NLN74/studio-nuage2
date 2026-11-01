@@ -26,14 +26,19 @@
   }
   if(isEditor)return;
   const s=settings();
-  for(const a of document.querySelectorAll('a[href]')){const href=a.getAttribute('href');if(/(?:\.\/|\/site\/)planning\.html#reservation$/.test(href)&&s.bookingUrl)a.href=s.bookingUrl;}
+  const safeLink=value=>{try{const u=new URL(value);return u.protocol==='https:'&&!u.username&&!u.password?u.href:''}catch{return ''}};
+  const external=(a,url)=>{a.href=url;a.target='_blank';a.rel='noopener noreferrer'};
+  const booking=safeLink(s.bookingUrl),prices=safeLink(s.pricesUrl)||booking,schedule=safeLink(s.scheduleUrl);
+  for(const a of document.querySelectorAll('a[href]')){const href=a.getAttribute('href');if(/(?:\.\/|\/site\/)planning\.html#reservation$/.test(href)&&booking)external(a,booking);}
+  const destinations={booking,prices,profile:safeLink(s.profileUrl),app:safeLink(s.appUrl)};
+  for(const a of document.querySelectorAll('[data-eversports-link]')){const url=destinations[a.dataset.eversportsLink];if(url)external(a,url)}
   const reservation=document.querySelector('.eversports-section');
-  if(reservation&&(s.scheduleWidgetId||s.scheduleUrl)){
+  if(reservation&&s.scheduleEnabled!==false&&(s.scheduleWidgetId||schedule)){
    reservation.replaceChildren();
    if(s.scheduleWidgetId){const widget=document.createElement('div');widget.dataset.eversportsWidgetId=s.scheduleWidgetId;reservation.append(widget);const script=document.createElement('script');script.src='https://widget-static.eversports.io/loader.js';script.type='module';script.async=true;script.onerror=()=>{const p=document.createElement('p');p.textContent='Le planning ne s’affiche pas. Utilisez le lien ci-dessous ou contactez le studio sur Instagram.';reservation.prepend(p)};document.head.append(script)}
-   const a=document.createElement('a');a.className='button';a.textContent=s.scheduleUrl?'Ouvrir le planning Eversports':'Écrire sur Instagram';a.href=s.scheduleUrl||'https://ig.me/m/'+s.instagram;reservation.append(a);
+   const a=document.createElement('a');a.className='button';a.textContent=schedule?'Ouvrir le planning Eversports':'Écrire sur Instagram';a.href=schedule||'https://ig.me/m/'+s.instagram;reservation.append(a);
   }
-  if(s.pricesUrl)for(const a of document.querySelectorAll('.pricing-grid a.button'))a.href=s.pricesUrl;
+  if(prices)for(const a of document.querySelectorAll('.pricing-grid a.button'))external(a,prices);
  }
  window.nuageInit=init;init();
 })();
