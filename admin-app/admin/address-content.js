@@ -1,3 +1,4 @@
+import {updateMapBox} from './map-links.js';
 // Patch detached content only; keep layout, inline styles and editor IDs intact.
 export function applyAddress(doc,address,point){
  const old=doc.global.settings,replacements=['street','postcode','city'].filter(k=>old[k]&&old[k]!==address[k]).map(k=>[old[k],address[k]]).sort((a,b)=>b[0].length-a[0].length);
@@ -7,8 +8,7 @@ export function applyAddress(doc,address,point){
   while(n=walk.nextNode())for(const[a,b]of replacements)n.nodeValue=n.nodeValue.replaceAll(a,b);
   for(const block of t.content.querySelectorAll('address'))block.replaceChildren(document.createTextNode(address.street),document.createElement('br'),document.createTextNode(address.postcode+' '+address.city));
   for(const box of t.content.querySelectorAll('.studio-map')){
-   box.dataset.mapLat=String(point.lat);box.dataset.mapLng=String(point.lng);box.dataset.mapLabel=point.label;
-   const link=box.querySelector('a');if(link)link.href=`https://www.openstreetmap.org/?mlat=${point.lat}&mlon=${point.lng}#map=17/${point.lat}/${point.lng}`;
+   updateMapBox(box,point);
   }
   for(const caption of t.content.querySelectorAll('.map-caption'))if(caption.textContent.startsWith('Emplacement provisoire'))caption.remove();
   for(const label of t.content.querySelectorAll('.sample-label'))if(label.textContent.trim()==='Adresse d’illustration')label.remove();

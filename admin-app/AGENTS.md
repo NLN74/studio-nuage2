@@ -8,3 +8,5 @@
 - Le repère peut être ajusté puis replacé selon l’adresse, même après enregistrement et réouverture. Les coordonnées et le lien d’itinéraire doivent rester synchronisés.
 
 - Les groupes de cartes (coachs, tarifs, questions, cours et galeries) proposent un ajout, un déplacement et une suppression du bon élément, même quand un texte intérieur est sélectionné. Garder les réglages mobiles lors de la copie et une seule annulation par action. Les fiches coach contiennent une photo, un nom et trois mots distincts. L’onglet Infos affiche les dimensions et les données de l’image sans changer le style.
+
+- Quatre coachs à l’ouverture, une page de présentation par carte, modifiable dans le panneau. Conserver la synchronisation du nom, du portrait et des trois mots, sans écraser la biographie. Aucun libellé de provenance technique visible. Le plan ouvre Google Maps par défaut et propose Apple Plans ; garder la position manuelle, une carte visible sans scripts et des icônes SVG sans emoji. La section des accessoires possède un fond gris distinct.

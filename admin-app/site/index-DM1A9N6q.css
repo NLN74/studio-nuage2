@@ -52,3 +52,63 @@
 .footer-compact .footer-bottom{display:grid;grid-template-columns:1fr auto;padding-block:13px;gap:9px 10px;font-size:8px}.footer-compact .footer-bottom>div{gap:12px}.footer-compact .demo-footnote{grid-column:1/-1;font-size:8px}
 }
 @media(max-width:360px){.footer-compact .logo-crop{width:128px}.footer-compact .footer-instagram{font-size:9px}.footer-compact .footer-grid{gap:16px}.footer-compact .footer-grid nav{gap:8px;font-size:9px}}
+
+/* Cartes de l’équipe et pages de présentation. */
+.coach-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:28px 24px}
+.coach-card-link{display:block;color:inherit;text-decoration:none;height:100%}
+.coach-card-link:focus-visible{outline:1px solid var(--ink);outline-offset:6px}
+.coach-card-link .coach-portrait img{transition:transform .35s ease}
+.coach-card-link:hover .coach-portrait img{transform:scale(1.025)}
+.coach-caption h3{font-size:clamp(29px,2.9vw,40px)}
+.coach-more{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px;font-size:10px;line-height:1.5;min-height:26px}
+.coach-more svg{flex:none}.coach-card-link:hover .coach-more{text-decoration:underline;text-underline-offset:4px}
+.coach-profile{padding-block:40px 64px}.coach-back{display:inline-flex;margin-bottom:34px;font-size:12px;min-height:32px;align-items:center}
+.coach-profile-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(32px,7vw,100px);align-items:start}
+.coach-profile-portrait{background:#d2cec7}.coach-profile-portrait img{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover}
+.coach-profile-copy{padding-top:18px}.coach-profile-copy h1{font-size:clamp(58px,7vw,96px);line-height:1;margin:24px 0}
+.coach-profile-copy .coach-words{margin-bottom:34px}.coach-profile-copy h2{font-size:30px;margin:0 0 12px}
+.coach-profile-bio,.coach-profile-courses{margin-bottom:30px}.coach-profile-copy p:not(.eyebrow){font-size:14px;line-height:1.9;max-width:480px}.coach-profile-copy>.button{margin-top:8px}
+#main>.accessories{background:#deded8;box-shadow:0 0 0 100vmax #deded8;clip-path:inset(0 -100vmax);padding-block:44px}
+/* Plans accessibles sans dépendre du chargement du panneau. */
+.site-footer.footer-compact .studio-map{background:transparent;display:block;overflow:visible;isolation:auto;position:relative}
+.studio-map-static{height:112px;position:relative;overflow:hidden;background:#ddd7c9}
+.map-tile-grid{position:absolute;left:50%;top:50%;width:768px;height:768px;filter:grayscale(1) sepia(.2) saturate(.6) contrast(.85)}
+.studio-map-static .map-tile-grid img{position:absolute;display:block;max-width:none!important;width:256px!important;height:256px!important;object-fit:fill}
+.map-static-pin{position:absolute;left:50%;top:50%;width:10px;height:10px;border:2px solid #f8f3e7;border-radius:50%;background:#30372b;box-shadow:0 0 0 5px #f4efdd80;transform:translate(-50%,-50%)}
+.studio-map-static .map-static-credit{position:absolute;right:0;bottom:0;display:block;padding:1px 4px;background:#f9f5e9e6;font:8px/1.5 Arial,sans-serif;color:#4a4b43;text-decoration:none}
+.studio-map-canvas~.studio-map-static{display:none}
+.map-directions{display:flex;position:relative;gap:0;margin-top:6px;border:1px solid #505149;min-height:38px;background:#111;color:#eeede6}
+.map-directions .map-primary{display:flex;align-items:center;justify-content:space-between;gap:8px;flex:1;padding:9px 11px;font-size:11px;line-height:1.3;color:inherit;text-decoration:none}
+.map-primary svg{flex:none}.map-apps{position:relative;flex:0 0 34px;border-left:1px solid #505149}
+.map-apps summary{display:flex;align-items:center;justify-content:center;cursor:pointer;height:100%;min-height:38px;list-style:none;padding:0;color:inherit}
+.map-apps summary::-webkit-details-marker{display:none}.map-apps[open] summary svg{transform:rotate(180deg)}
+.map-apps-menu{position:absolute;right:-1px;bottom:calc(100% + 7px);z-index:100;min-width:158px;padding:6px;background:#efeee8;color:#171916;border:1px solid #c6c8bd;box-shadow:0 8px 25px #0003}
+.map-apps-menu a{display:flex;align-items:center;min-height:40px;padding:9px 10px;font-size:12px;line-height:1.4;color:inherit;text-decoration:none}.map-apps-menu a:hover{background:#dcded2}
+.map-primary:focus-visible,.map-apps summary:focus-visible,.map-apps-menu a:focus-visible{outline:2px solid #b7bba5;outline-offset:3px}
+.site-footer.footer-compact .studio-map-canvas{height:112px}
+.footer-compact .footer-grid{grid-template-columns:1fr .65fr 1fr 230px;gap:28px;align-items:start;padding-bottom:28px}
+.footer-compact .footer-instagram{border:1px solid #55564e;min-height:38px;padding:8px 11px;margin-top:13px;font-size:11px;line-height:1.3}
+.footer-compact .footer-instagram:hover{border-color:#b9bcac}.footer-compact .footer-location{font-size:11px;line-height:1.7}
+.footer-compact .footer-bottom{font-size:10px;padding-block:16px;gap:14px}.footer-compact .demo-footnote{display:none}
+.theme-immersive #main>.cta-panel:last-child{padding-block:44px}
+.theme-immersive #main>.cta-panel:last-child h2{font-size:clamp(40px,4.5vw,64px);margin:18px 0}
+.theme-immersive #main>.cta-panel:last-child .button{margin-top:24px}
+@media(max-width:950px){.coach-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.footer-compact .footer-grid{grid-template-columns:1fr .65fr 1fr 190px;gap:20px}}
+@media(max-width:700px){
+.footer-compact .footer-grid{grid-template-columns:minmax(0,1fr) minmax(140px,.9fr);gap:18px 20px;padding-bottom:22px}
+.footer-compact .footer-brand{grid-column:1/-1;grid-template-columns:1fr 44px;align-items:start;gap:0 12px}
+.footer-compact .logo-crop{width:145px}.footer-compact .footer-location{font-size:10px;line-height:1.7;margin-top:7px}
+.footer-compact .footer-instagram{width:44px;height:44px;min-height:44px;padding:0;justify-content:center;margin:0;grid-row:1/3;align-self:start}
+.footer-compact .footer-instagram .instagram-icon{width:20px;height:20px}.footer-compact .footer-instagram span{display:none}
+.footer-compact .footer-grid nav{grid-column:1/-1;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding-block:0;font-size:11px}
+.footer-compact .footer-grid nav a{min-height:44px}.footer-compact .footer-address{grid-column:1;grid-row:3}.footer-compact .footer-map{grid-column:2;grid-row:3}
+.footer-compact .footer-address .eyebrow{font-size:9px;letter-spacing:.1em;margin:4px 0 10px}.footer-compact .footer-grid address{font-size:12px;line-height:1.8}
+.site-footer.footer-compact .studio-map-canvas,.studio-map-static{height:90px}
+.map-directions{min-height:38px;margin-top:6px}.map-directions .map-primary{padding:8px;font-size:10px;gap:5px}.map-apps{flex-basis:30px}.map-apps summary{min-height:38px}
+.footer-compact .footer-bottom{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;font-size:9px;padding-block:16px;gap:14px}.footer-compact .footer-bottom>div{gap:14px;flex-wrap:wrap}
+.coach-profile{padding-block:24px 40px}.coach-profile-grid{grid-template-columns:1fr;gap:28px}.coach-profile-portrait{max-width:480px}.coach-profile-copy{padding:0}.coach-profile-copy h1{font-size:60px}.coach-back{margin-bottom:20px}
+}
+@media(max-width:600px){.coach-grid{gap:25px 14px}.coach-caption h3{font-size:29px}.coach-words li{font-size:8px;letter-spacing:.06em}.coach-words li+li::before{padding-inline:5px}.coach-more{font-size:9px;gap:6px;margin-top:12px}.coach-portrait{aspect-ratio:3/4;max-height:none}#main>.accessories{padding-block:32px}.theme-immersive #main>.cta-panel:last-child{padding-block:30px}.theme-immersive #main>.cta-panel:last-child h2{font-size:38px;margin:15px 0;line-height:1.05}.theme-immersive #main>.cta-panel:last-child p:not(.eyebrow){font-size:12px;line-height:1.8}.theme-immersive #main>.cta-panel:last-child .eyebrow{font-size:9px;letter-spacing:.13em}.theme-immersive #main>.cta-panel:last-child .button{margin-top:20px;min-height:44px;font-size:11px;padding:13px 18px}}
+@media(prefers-reduced-motion:reduce){.coach-card-link .coach-portrait img{transition:none}.coach-card-link:hover .coach-portrait img{transform:none}}
+
+.map-apps{padding:0!important;margin:0;border-block:0}.map-apps summary{height:auto;min-height:38px}.map-preview-hit{position:absolute;inset:0;z-index:2;display:block;cursor:pointer}.studio-map-static .map-static-credit{z-index:3}.map-preview-hit:focus-visible{outline:2px solid #333;outline-offset:-3px}

@@ -1,3 +1,4 @@
+import {updateMapBox} from './map-links.js';
 import {normalizeMapPoint} from './map-position.js';
 // This map belongs to the admin; exported/public maps keep the static runtime.
 export function createMapEditor({box,onMove,onDragState=()=>{},onError=()=>{},canMove=()=>true}){
@@ -11,14 +12,13 @@ export function createMapEditor({box,onMove,onDragState=()=>{},onError=()=>{},ca
  const marker=L.marker([lat,lng],{draggable:true,autoPan:true,keyboard:true,title:'Déplacer le repère',icon:L.divIcon({className:'studio-map-pin cms-map-handle',html:'<span></span>',iconSize:[36,36],iconAnchor:[18,18]})}).addTo(map);
  marker.getElement().setAttribute('aria-label','Déplacer le repère du studio');
  let drag=null,busy=false,cancelling=false,destroyed=false;
- const link=box.querySelector('a');
  function commit(before){
   try{
    const point=normalizeMapPoint(map.wrapLatLng(marker.getLatLng()));
    if(Math.abs(before.lat-point.lat)<1e-7&&Math.abs(before.lng-point.lng)<1e-7)return;
    if(!canMove()||onMove(point)===false){marker.setLatLng(before);return}
    marker.setLatLng(point);box.dataset.mapLat=String(point.lat);box.dataset.mapLng=String(point.lng);
-   if(link)link.href=`https://www.openstreetmap.org/?mlat=${point.lat}&mlon=${point.lng}#map=17/${point.lat}/${point.lng}`;
+   updateMapBox(box,point);
   }catch(e){marker.setLatLng(before);onError(e.message)}
  }
  function cancel(){

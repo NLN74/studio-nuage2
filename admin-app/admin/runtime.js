@@ -12,6 +12,7 @@
    const previous=maps.get(box);if(previous?.signature===signature)continue;if(previous){previous.intersection?.disconnect();previous.resize?.disconnect();previous.map?.remove();box.querySelector('[data-runtime-map]')?.remove();maps.delete(box);}
    if(!Number.isFinite(lat)||!Number.isFinite(lng)||Math.abs(lat)>85||Math.abs(lng)>180)continue;
    const surface=document.createElement('div');surface.className='studio-map-canvas';surface.dataset.runtimeMap='true';surface.setAttribute('role','region');surface.setAttribute('aria-label',box.dataset.mapLabel||'Plan du studio — emplacement provisoire');box.prepend(surface);
+   if(!isEditor){const openPlan=()=>{const href=box.querySelector('[data-map-provider="google"]')?.href;if(href)window.open(href,'_blank','noopener,noreferrer')};surface.style.cursor='pointer';surface.tabIndex=0;surface.setAttribute('role','link');surface.setAttribute('aria-label','Ouvrir ce plan dans Google Maps');surface.addEventListener('click',event=>{if(!event.target.closest('a,button'))openPlan()});surface.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();openPlan()}})}
    const item={map:null,intersection:null,resize:null,signature};maps.set(box,item);
    const mount=()=>{
     item.intersection?.disconnect();if(!document.contains(box)||item.map)return;

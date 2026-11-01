@@ -1,3 +1,4 @@
+import {updateMapBox} from './map-links.js';
 export function normalizeMapPoint(value){
  const {lat,lng}=value||{};
  if(!Number.isFinite(lat)||!Number.isFinite(lng)||Math.abs(lat)>85||Math.abs(lng)>180)throw Error('Position du repère invalide.');
@@ -12,8 +13,7 @@ export function moveMapPosition(doc,value){
  const update=html=>{
   const t=document.createElement('template');t.innerHTML=html;
   for(const box of t.content.querySelectorAll('.studio-map')){
-   box.dataset.mapLat=String(point.lat);box.dataset.mapLng=String(point.lng);box.dataset.mapLabel=point.label;
-   const link=box.querySelector('a');if(link)link.href=`https://www.openstreetmap.org/?mlat=${point.lat}&mlon=${point.lng}#map=17/${point.lat}/${point.lng}`;
+   updateMapBox(box,point);
   }
   return t.innerHTML;
  };
