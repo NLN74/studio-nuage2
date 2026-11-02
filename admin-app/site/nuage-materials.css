@@ -1,0 +1,38 @@
+/* Chêne naturel mat : photographie à son rapport d'origine, sans motif répété. */
+.theme-immersive{--bois:#e6d4b8;--bois-texte:#30271f;--veinage:url("./chene-naturel-mat-1536.webp")}
+.theme-immersive .cta-panel,
+.theme-immersive .plans-grid>article.featured,
+.theme-immersive #main>.manifesto:before{
+  background-color:var(--bois);
+  background-image:linear-gradient(#f5eee44d,#f5eee44d),var(--veinage);
+  background-position:center;
+  background-size:cover;
+  background-repeat:no-repeat;
+}
+/* Le fond traverse toute la fenêtre, sans étirer les fibres du bois. */
+.theme-immersive #main>.manifesto{position:relative;isolation:isolate;box-shadow:none;border-image:none;background:none;color:#1a1511}
+.theme-immersive #main>.manifesto:before{content:"";position:absolute;top:0;bottom:0;left:50%;width:100vw;transform:translateX(-50%);z-index:-1;pointer-events:none}
+.theme-immersive .cta-panel,
+.theme-immersive .plans-grid>article.featured{color:#1a1511;border-color:#c9b392}
+.theme-immersive .manifesto>div{border-left-color:#ac9678}
+.theme-immersive :is(.manifesto,.cta-panel) :is(p,.eyebrow),
+.theme-immersive .plans-grid>article.featured :is(.plan-category,.plan-commitment,.price-caption,ul,.eyebrow){color:var(--bois-texte)}
+.theme-immersive :is(.manifesto,.cta-panel) .text-link,
+.theme-immersive .plans-grid>article.featured :is(.plan-unit,.plan-saving){color:#1a1511;border-color:#826b4e}
+.theme-immersive .plans-grid>article.featured ul{border-color:#ac9678}
+.theme-immersive :is(.cta-panel,.plans-grid>article.featured) .button{background:#1a1511;border-color:#1a1511;color:#f5eee4}
+.theme-immersive :is(.cta-panel,.plans-grid>article.featured) .button:hover{background:#51493f;border-color:#51493f}
+
+/* Photographie panoramique sous le héros, dans ses teintes naturelles. */
+.theme-immersive .mezzanine-ribbon{margin:0;padding:0;background:#b7a492;line-height:0}
+.theme-immersive .mezzanine-ribbon img{display:block;width:100%;height:auto;aspect-ratio:3/1;object-fit:cover;object-position:50% 15%;filter:none}
+.theme-immersive #main>.manifesto-after-ribbon{padding-top:clamp(32px,4vw,56px);padding-bottom:clamp(32px,4vw,56px);background:var(--paper);color:var(--ink)}
+.theme-immersive #main>.manifesto-after-ribbon:before{left:0;width:100%;transform:none;background:var(--paper);box-shadow:0 0 0 100vmax var(--paper);clip-path:inset(0 -100vmax)}
+.theme-immersive #main>.manifesto-after-ribbon h2{font-size:clamp(32px,4vw,58px)}
+.theme-immersive .editorial-grid:has(.editorial-studio-text){grid-template-columns:1fr 1fr;align-items:center}
+.theme-immersive .editorial-studio-text{align-self:center;padding-bottom:24px}
+@media(max-width:760px){
+ .theme-immersive .mezzanine-ribbon img{aspect-ratio:auto}
+ .theme-immersive .editorial-grid:has(.editorial-studio-text){grid-template-columns:1fr}
+ .theme-immersive .editorial-studio-text{padding-bottom:0}
+}
